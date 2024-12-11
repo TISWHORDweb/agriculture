@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import React, { useState, useRef, useEffect } from 'react';
+import { Upload, Camera, MapPin, Crop, Layers, AlertTriangle } from 'lucide-react';
 import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
+import UserService from '../../api/user.service';
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
-// Define the schema with the necessary fields
+// Updated Zod Schema to match Mongoose model
 const landSchema = z.object({
+  farmer: z.string(), // Mongoose ObjectId as string
   name: z.string().min(2, 'Name must be at least 2 characters'),
   location: z.object({
     state: z.string().min(2, 'State is required'),
@@ -13,11 +16,11 @@ const landSchema = z.object({
     ward: z.string().optional(),
     lga: z.string().optional(),
     coordinates: z.object({
-      latitude: z.number().min(-90, 'Latitude must be between -90 and 90').max(90, 'Latitude must be between -90 and 90'),
-      longitude: z.number().min(-180, 'Longitude must be between -180 and 180').max(180, 'Longitude must be between -180 and 180'),
+      latitude: z.number().optional(),
+      longtitude: z.number().optional(),
     }).optional(),
   }),
-  image: z.string().min(2, 'Image URL is required'),
+  image: z.string(), // URL from Cloudinary
   totalArea: z.object({
     value: z.number().positive('Total area must be positive'),
     unit: z.enum(['acres', 'hectares', 'square meters']),
@@ -32,205 +35,368 @@ interface CreateLandProps {
   onClose: () => void;
 }
 
-const CreateLand: React.FC<CreateLandProps> = ({ onClose }) => {
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<LandFormData>({
-    resolver: zodResolver(landSchema),
-  });
+const CreateLand: React.FC<CreateLandProps> = ({ 
+  onClose 
+}) => {
+
+  const [formData, setFormData] = useState<Partial<LandFormData>>({});
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [latitude, setLatitude] = useState(0);
+  const [longtitude, setLongtitude] = useState(0);
+  const [landState, setLandState] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState<string | null>(null); // For error messages
+  const userService = new UserService();
+  const navigate = useNavigate();
+
+  const handleInputChange = (
+    field: string, 
+    value: string | number, 
+    nestedField?: string
+  ) => {
+    setFormData(prev => {
+      if (nestedField) {
+        return {
+          ...prev,
+          [field]: {
+            ...(prev[field as keyof LandFormData] as object),
+            [nestedField]: value
+          }
+        };
+      }
+      return { ...prev, [field]: value };
+    });
+  };
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
-
-    setLoading(true);
-
+    if (!file) return null;
+  
+    // Preview image
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  
+    setImageFile(file);
+    setUploadProgress(0);
+  
     try {
-      // Create FormData for Cloudinary upload
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('upload_preset', process.env.REACT_APP_CLOUDINARY_UPLOAD_PRESET!);  // Use environment variable for Cloudinary upload preset
-
-      const response = await axios.post(`https://api.cloudinary.com/v1_1/${process.env.REACT_APP_CLOUDINARY_CLOUD_NAME}/upload`, formData);
-
-      if (response.status === 200) {
-        setImageUrl(response.data.secure_url); // Set the Cloudinary image URL
-        setLoading(false);
-      }
+  
+      // Use your custom upload preset, or ensure your default preset is whitelisted for unsigned uploads.
+      const uploadPreset = "Emmanuel"; // Make sure this is whitelisted in Cloudinary settings.
+  
+      const response = await axios.post(
+        `https://api.cloudinary.com/v1_1/dq5nc6lbr/upload`, 
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+          params: {
+            upload_preset: uploadPreset, // Replace with your custom preset if necessary
+          },
+          onUploadProgress: (progressEvent) => {
+            const percentCompleted = Math.round(
+              (progressEvent.loaded * 100) / (progressEvent.total || 1)
+            );
+            setUploadProgress(percentCompleted);
+          },
+        }
+      );
+  
+      // Update form data with image URL
+      setFormData(prev => ({
+        ...prev,
+        image: response.data.secure_url
+      }));
+  
+      return response.data.secure_url;
     } catch (error) {
-      console.error('Error uploading image:', error);
-      setLoading(false);
-      alert('Image upload failed. Please try again.');
+      console.error('Image upload failed:', error);
+      return null;
     }
   };
+  
 
-  const onSubmit = async (data: LandFormData) => {
-    if (!imageUrl) {
-      alert('Please upload an image before submitting.');
-      return;
-    }
-
-    const landData = {
-      ...data,
-      image: imageUrl,  // Use the URL from Cloudinary
-      location: {
-        ...data.location,
-        coordinates: {
-          latitude: data.location.coordinates?.latitude,
-          longitude: data.location.coordinates?.longitude,
-        },
-      },
-    };
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("response");
+    // Validate form
 
     try {
-      const response = await axios.post('/api/lands', landData);
-      if (response.status === 200) {
-        console.log('Land created successfully:', response.data);
-        onClose(); // Close the form after successful creation
+        console.log("in");
+      const response = await userService.land({
+        ...formData,
+        location:{
+            state: landState,
+            coordinates:{latitude,longtitude}},
+        image: formData.image! 
+      });
+      console.log(response);
+      if (!response.status) {
+        toast.error(response?.message);
+        return;
       }
-    } catch (error) {
-      console.error('Error creating land:', error);
-      alert('There was an error creating the land. Please try again.');
+
+      toast.success(response?.message);
+      localStorage.setItem("authToken", response.data.token);
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1000);
+    } catch (error: any) {
+      setError(
+        error.response?.data?.message || "Login failed. Please try again."
+      );
     }
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      {/* Land Name */}
-      <div>
-        <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-          Land Name
-        </label>
-        <input
-          {...register('name')}
-          type="text"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-500 h-10 py-2 px-2 text-base"
-        />
-        {errors.name && <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>}
-      </div>
+    <div className="bg-white shadow-xl rounded-lg p-6 max-w-2xl mx-auto">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+        <Layers className="mr-3 text-green-600" />
+        Add New Land
+      </h2>
 
-      {/* Location (State, Address, Ward, LGA, Coordinates) */}
-      <div>
-        <label htmlFor="location.state" className="block text-sm font-medium text-gray-700">
-          State
-        </label>
-        <input
-          {...register('location.state')}
-          type="text"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-500 h-10 py-2 px-2 text-base"
-        />
-        {errors.location?.state && <p className="mt-1 text-sm text-red-600">{errors.location.state.message}</p>}
-      </div>
-
-      <div>
-        <label htmlFor="location.address" className="block text-sm font-medium text-gray-700">
-          Address (Optional)
-        </label>
-        <input
-          {...register('location.address')}
-          type="text"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-500 h-10 py-2 px-2 text-base"
-        />
-      </div>
-
-      {/* Image Upload */}
-      <div>
-        <label htmlFor="image" className="block text-sm font-medium text-gray-700">
-          Upload Land Image
-        </label>
-        <input
-          type="file"
-          onChange={handleImageUpload}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-500 h-10 py-2 px-2 text-base"
-        />
-        {loading && <p className="mt-2 text-sm text-gray-600">Uploading image...</p>}
-        {imageUrl && <p className="mt-2 text-sm text-green-600">Image uploaded successfully!</p>}
-        {errors.image && <p className="mt-1 text-sm text-red-600">{errors.image.message}</p>}
-      </div>
-
-      {/* Total Area and Unit */}
-      <div className="flex gap-4">
-        <div className="w-2/3">
-          <label htmlFor="totalArea.value" className="block text-sm font-medium text-gray-700">
-            Total Area (Value)
-          </label>
-          <input
-            {...register('totalArea.value')}
-            type="number"
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-500 h-10 py-2 px-2 text-base"
-          />
-          {errors.totalArea?.value && (
-            <p className="mt-1 text-sm text-red-600">{errors.totalArea.value.message}</p>
-          )}
-        </div>
-        <div className="w-1/3">
-          <label htmlFor="totalArea.unit" className="block text-sm font-medium text-gray-700">
-            Unit
-          </label>
-          <select
-            {...register('totalArea.unit')}
-            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-500 h-10 py-2 px-2 text-base"
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Image Upload Section */}
+        <div className="flex items-center space-x-4">
+          <div 
+            onClick={() => fileInputRef.current?.click()}
+            className="relative w-full h-32 rounded-lg border-2 border-dashed border-green-300 flex items-center justify-center cursor-pointer hover:bg-green-50 transition"
           >
-            <option value="acres">Acres</option>
-            <option value="hectares">Hectares</option>
-            <option value="square meters">Square Meters</option>
-          </select>
-          {errors.totalArea?.unit && (
-            <p className="mt-1 text-sm text-red-600">{errors.totalArea.unit.message}</p>
+            {imagePreview ? (
+              <img 
+                src={imagePreview} 
+                alt="Land Preview" 
+                className="w-full h-full object-cover rounded-lg"
+              />
+            ) : (
+              <div className="text-center">
+                <Upload className="mx-auto text-green-600 mb-2" />
+                <p className="text-sm text-gray-600">Upload Image</p>
+              </div>
+            )}
+          </div>
+          
+          <input 
+            type="file" 
+            ref={fileInputRef}
+            onChange={handleImageUpload}
+            accept="image/*"
+            hidden 
+          />
+
+          {uploadProgress > 0 && (
+            <div className="w-full bg-gray-200 rounded-full h-2.5">
+              <div 
+                className="bg-green-600 h-2.5 rounded-full" 
+                style={{ width: `${uploadProgress}%` }}
+              ></div>
+            </div>
           )}
         </div>
-      </div>
 
-      {/* Land Type */}
-      <div>
-        <label htmlFor="landType" className="block text-sm font-medium text-gray-700">
-          Land Type
-        </label>
-        <select
-          {...register('landType')}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-500 h-10 py-2 px-2 text-base"
-        >
-          <option value="agricultural">Agricultural</option>
-          <option value="pasture">Pasture</option>
-          <option value="orchard">Orchard</option>
-          <option value="other">Other</option>
-        </select>
-        {errors.landType && <p className="mt-1 text-sm text-red-600">{errors.landType.message}</p>}
-      </div>
+        {/* Location Section with Additional Fields */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Land Name
+            </label>
+            <div className="flex items-center border rounded-lg">
+              <input 
+                type="text"
+                value={formData.name || ''}
+                onChange={(e) => handleInputChange('name', e.target.value)}
+                placeholder="Enter land name"
+                className="w-full p-3 rounded-lg border-none focus:ring-2 focus:ring-green-500 outline-none"
+              />
+            </div>
+            {errors.name && (
+              <p className="text-red-500 text-xs mt-1">{errors.name}</p>
+            )}
+          </div>
 
-      {/* Current Crop */}
-      <div>
-        <label htmlFor="currentCrop" className="block text-sm font-medium text-gray-700">
-          Current Crop (Optional)
-        </label>
-        <input
-          {...register('currentCrop')}
-          type="text"
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-2 focus:ring-green-500 h-10 py-2 px-2 text-base"
-        />
-      </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              State
+            </label>
+            <div className="flex items-center border rounded-lg">
+              <MapPin className="ml-3 text-green-600" />
+              <input 
+                type="text"
+                value={landState}
+              onChange={(e) => setLandState(e.target.value)}
+                placeholder="Enter state"
+                className="w-full p-3 rounded-lg border-none focus:ring-2 focus:ring-green-500 outline-none"
+              />
+            </div>
+            {errors['location.state'] && (
+              <p className="text-red-500 text-xs mt-1">{errors['location.state']}</p>
+            )}
+          </div>
+        </div>
 
-      <div className="flex gap-4 mt-6">
-        <button
-          type="button"
-          onClick={onClose}
-          className="flex-1 py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          className="flex-1 py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-        >
-          Add Land
-        </button>
-      </div>
-    </form>
+        {/* Additional Location Details */}
+        <div className="grid md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Address (Optional)
+            </label>
+            <input 
+              type="text"
+              value={formData.location?.address || ''}
+              onChange={(e) => handleInputChange('location', e.target.value, 'address')}
+              placeholder="Enter address"
+              className="w-full p-3 rounded-lg border focus:ring-2 focus:ring-green-500 outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Ward (Optional)
+            </label>
+            <input 
+              type="text"
+              value={formData.location?.ward || ''}
+              onChange={(e) => handleInputChange('location', e.target.value, 'ward')}
+              placeholder="Enter ward"
+              className="w-full p-3 rounded-lg border focus:ring-2 focus:ring-green-500 outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              LGA (Optional)
+            </label>
+            <input 
+              type="text"
+              value={formData.location?.lga || ''}
+              onChange={(e) => handleInputChange('location', e.target.value, 'lga')}
+              placeholder="Enter LGA"
+              className="w-full p-3 rounded-lg border focus:ring-2 focus:ring-green-500 outline-none"
+            />
+          </div>
+        </div>
+
+        {/* Coordinates (Optional) */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Latitude (Optional)
+            </label>
+            <input 
+              type="number"
+              step="0.000001"
+              value={latitude}
+              onChange={(e) => setLatitude(Number(e.target.value))}
+              placeholder="Enter latitude"
+              className="w-full p-3 rounded-lg border focus:ring-2 focus:ring-green-500 outline-none"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Longitude (Optional)
+            </label>
+            <input 
+              type="number"
+              step="0.000001"
+              value={longtitude}
+              onChange={(e) => setLongtitude(Number(e.target.value))}
+              placeholder="Enter longitude"
+              className="w-full p-3 rounded-lg border focus:ring-2 focus:ring-green-500 outline-none"
+            />
+          </div>
+        </div>
+
+        {/* Total Area and Land Type */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Total Area
+            </label>
+            <div className="flex items-center border rounded-lg">
+              <Crop className="ml-3 text-green-600" />
+              <input 
+                type="number"
+                value={formData.totalArea?.value || ''}
+                onChange={(e) => handleInputChange('totalArea', Number(e.target.value), 'value')}
+                placeholder="Area value"
+                className="w-full p-3 rounded-lg border-none focus:ring-2 focus:ring-green-500 outline-none"
+              />
+              <select
+                value={formData.totalArea?.unit || ''}
+                onChange={(e) => handleInputChange('totalArea', e.target.value, 'unit')}
+                className="bg-transparent border-l p-3 focus:ring-2 focus:ring-green-500"
+              >
+                <option value="">Unit</option>
+                <option value="acres">Acres</option>
+                <option value="hectares">Hectares</option>
+                <option value="square meters">Square Meters</option>
+              </select>
+            </div>
+            {errors['totalArea.value'] && (
+              <p className="text-red-500 text-xs mt-1">{errors['totalArea.value']}</p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Land Type
+            </label>
+            <select
+              value={formData.landType || ''}
+              onChange={(e) => handleInputChange('landType', e.target.value)}
+              className="w-full p-3 rounded-lg border focus:ring-2 focus:ring-green-500"
+            >
+              <option value="">Select Land Type</option>
+              <option value="agricultural">Agricultural</option>
+              <option value="pasture">Pasture</option>
+              <option value="orchard">Orchard</option>
+              <option value="other">Other</option>
+            </select>
+            {errors.landType && (
+              <p className="text-red-500 text-xs mt-1">{errors.landType}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Current Crop (Optional) */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Current Crop (Optional)
+          </label>
+          <input 
+            type="text"
+            value={formData.currentCrop || ''}
+            onChange={(e) => handleInputChange('currentCrop', e.target.value)}
+            placeholder="Enter current crop"
+            className="w-full p-3 rounded-lg border focus:ring-2 focus:ring-green-500 outline-none"
+          />
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex justify-between space-x-4 mt-6">
+          <button 
+            type="button" 
+            onClick={onClose}
+            className="w-full py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition"
+          >
+            Cancel
+          </button>
+          <button 
+            type="submit"
+            className="w-full py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+          >
+            Add Land
+          </button>
+        </div>
+      </form>
+    </div>
   );
 };
 

@@ -31,7 +31,7 @@ export async function request(url: string, method: string, payload: any, token: 
   const bearerToken = localStorage.getItem('authToken');
 
   if (token) {
-    requestHeader['authorization'] = `bearer ${bearerToken}`;
+    requestHeader['Authorization'] = `Bearer ${bearerToken}`;
   }
 
   requestHeader["Content-Type"] = form === true ? "multipart/form-data" : "application/json";
