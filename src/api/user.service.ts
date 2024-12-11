@@ -31,6 +31,21 @@ class UserService {
             throw err;
         }
     }
+    async getLands() {
+        try {
+            const response = await request(
+                `/farmer/lands` ,
+                'GET',
+                {},
+                true,
+                false,
+                false,
+            )
+            return response;
+        }catch(err){
+            throw err;
+        }
+    }
 }
 
 
