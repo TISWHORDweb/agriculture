@@ -59,9 +59,9 @@ const CreateSoilTester: React.FC<CreateSoilTesterProps> = ({ onClose }) => {
       setError("Failed to save request. Please try again.");
     }
   
-      
+      window.location.reload();
      
-    //onClose();
+    onClose();
   };
 
   return (
