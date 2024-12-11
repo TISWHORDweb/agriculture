@@ -22,7 +22,7 @@ const Sidebar = () => {
 
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
-    { icon: TestTube, label: 'Soil Testers', path: '/soil-testers' },
+    { icon: TestTube, label: 'Land Tests', path: '/land-tests' },
     { icon: BarChart2, label: 'Analytics', path: '/analytics' },
     { icon: Trees, label: 'Land', path: '/land' },
     // { icon: Wheat, label: 'Harvesting', path: '/harvesting' },

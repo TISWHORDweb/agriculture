@@ -29,13 +29,13 @@ const SoilTesterList = () => {
     <DashboardLayout>
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6 mt-4">
-          <h2 className="text-2xl font-semibold">Soil Testers</h2>
+          <h2 className="text-2xl font-semibold">Land Tests</h2>
           <button
             onClick={() => setIsModalOpen(true)}
             className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
           >
             <Plus className="w-4 h-4" />
-            Add New Tester
+            Create Test
           </button>
         </div>
 
@@ -112,7 +112,7 @@ const SoilTesterList = () => {
               alt=""
               className="w-44 absolute top-1/4 left-1/2 transform -translate-x-1/2"
             />
-            <span>No tester data </span>
+            <span>No Test data </span>
           </div>
         )}
 
