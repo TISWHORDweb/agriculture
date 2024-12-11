@@ -1,12 +1,4 @@
 
-interface Profile {
-  firstName?: string;
-  lastName?: string;
-  contact?: string;
-  middleName?: string;
-  address?: string;
-}
-
 interface Location {
   state: string;
   address?: string;
@@ -22,7 +14,11 @@ export interface SignUpProps  {
   email: string;
   password: string;
   role: 'farmer' | 'agent' | 'admin';
-  profile?: Profile;
+  firstName?: string;
+  lastName?: string;
+  contact?: string;
+  middleName?: string;
+  address?: string;
   location: Location;
 }
 
