@@ -11,7 +11,7 @@ const Login = () => {
       alternativeAction={{
         text: "Don't have an account?",
         linkText: "Sign up",
-        href: "/register",
+        href: "/register/farmer",
       }}
     >
       <LoginForm />
