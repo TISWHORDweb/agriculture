@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Wheat, Sprout, Droplet } from 'lucide-react';
 import DashboardLayout from '../components/Layout/DashboardLayout';
@@ -38,7 +39,7 @@ const Dashboard = () => {
             title="Wheat"
             value={125}
             unit="Tons"
-            percentage={75}
+            percentage={100}
             icon={Wheat}
             color="bg-yellow-500"
           />
@@ -63,7 +64,7 @@ const Dashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
             <FarmPreview />
-            <ProductivityChart />
+            {/* <ProductivityChart /> */}
           </div>
           <div className="space-y-6">
             <WeatherCard />
