@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { Wheat } from 'lucide-react';
 
 interface AuthLayoutProps {
@@ -50,6 +52,7 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({
           </div>
         </div>
       </div>
+      <ToastContainer position="top-center" />
     </div>
   );
 };

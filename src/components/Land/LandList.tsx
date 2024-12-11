@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { useSoilTesterStore } from "../../store/soil-tester-store";
 import { Activity, Droplets, Thermometer, Plus } from "lucide-react";
 import DashboardLayout from "../Layout/DashboardLayout";
-import CreateSoilTester from "./CreateSoilTester";
 import Thumb from "../../assets/missing-data-vector-49849220-removebg-preview.png";
+import CreateLand from "./CreateLand";
 
-const SoilTesterList = () => {
+const LandList = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const soilTesters = useSoilTesterStore((state) => state.soilTesters);
   const updateSoilTester = useSoilTesterStore(
@@ -29,13 +29,13 @@ const SoilTesterList = () => {
     <DashboardLayout>
       <div className="max-w-7xl mx-auto">
         <div className="flex justify-between items-center mb-6 mt-4">
-          <h2 className="text-2xl font-semibold">Soil Testers</h2>
+          <h2 className="text-2xl font-semibold">Land</h2>
           <button
             onClick={() => setIsModalOpen(true)}
             className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
           >
             <Plus className="w-4 h-4" />
-            Add New Tester
+            Add New Land
           </button>
         </div>
 
@@ -120,9 +120,9 @@ const SoilTesterList = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-full max-w-md">
               <h2 className="text-2xl font-semibold mb-6">
-                Add New Soil Tester
+                Add New Land
               </h2>
-              <CreateSoilTester onClose={() => setIsModalOpen(false)} />
+              <CreateLand onClose={() => setIsModalOpen(false)} />
             </div>
           </div>
         )}
@@ -131,4 +131,4 @@ const SoilTesterList = () => {
   );
 };
 
-export default SoilTesterList;
+export default LandList;

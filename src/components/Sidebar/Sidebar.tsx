@@ -25,7 +25,7 @@ const Sidebar = () => {
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
     { icon: TestTube, label: 'Soil Testers', path: '/soil-testers' },
     { icon: BarChart2, label: 'Analytics', path: '/analytics' },
-    { icon: Trees, label: 'Fields', path: '/fields' },
+    { icon: Trees, label: 'Land', path: '/land' },
     { icon: Wheat, label: 'Harvesting', path: '/harvesting' },
     { icon: Cloud, label: 'Weather', path: '/weather' },
     { icon: Settings, label: 'Settings', path: '/settings' },

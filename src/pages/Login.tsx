@@ -1,6 +1,7 @@
 import React from 'react';
 import AuthLayout from '../components/Layout/AuthLayout';
 import LoginForm from '../components/Auth/LoginForm';
+import { ToastContainer } from 'react-toastify';
 
 const Login = () => {
   return (
