@@ -19,7 +19,7 @@ const StatCard: React.FC<StatCardProps> = ({
   color,
 }) => {
   return (
-    <div className="bg-white rounded-xl p-4 shadow-sm">
+    <div className="bg-white rounded-xl p-4 shadow-md">
       <div className="flex justify-between items-start">
         <div>
           <h3 className="text-gray-500 text-sm">{title}</h3>

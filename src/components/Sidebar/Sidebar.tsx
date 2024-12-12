@@ -22,9 +22,10 @@ const Sidebar = () => {
 
   const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', path: '/dashboard' },
+    { icon: Trees, label: 'Manage Lands', path: '/land' },
     { icon: TestTube, label: 'Land Tests', path: '/land-tests' },
-    { icon: BarChart2, label: 'Analytics', path: '/analytics' },
-    { icon: Trees, label: 'Land', path: '/land' },
+    // { icon: BarChart2, label: 'Analytics', path: '/analytics' },
+    
     // { icon: Wheat, label: 'Harvesting', path: '/harvesting' },
     // { icon: Cloud, label: 'Weather', path: '/weather' },
     { icon: User, label: 'Account', path: '/account' },
