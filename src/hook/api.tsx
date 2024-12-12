@@ -44,7 +44,7 @@ export async function request(url: string, method: string, payload: any, token: 
       .then((res: Response) => {
         if (res.status === 403 || res.status === 401) {
           // Redirect to the login page
-          // logout();
+          logout();
           throw new Error("Access forbidden. Redirecting to login page.");
           // Redirect to the login page
           // window.location.href = "/auth/login";
@@ -67,7 +67,7 @@ export async function request(url: string, method: string, payload: any, token: 
     })
       .then((res: Response) => {
         if (res.status === 403 || res.status === 401) {
-          // logout();
+          logout();
           throw new Error("Access forbidden. Redirecting to login page.");
           // Redirect to the login page
           // window.location.href = "/auth/login";

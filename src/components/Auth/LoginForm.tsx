@@ -41,6 +41,7 @@ const LoginForm = () => {
 
       toast.success(response?.message);
       localStorage.setItem("authToken", response.data.token);
+      localStorage.setItem("role", response.data.user.role);
       setTimeout(() => {
         navigate("/dashboard");
       }, 1000);

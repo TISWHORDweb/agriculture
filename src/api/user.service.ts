@@ -46,6 +46,36 @@ class UserService {
             throw err;
         }
     }
+    async getFarmerAnalytics() {
+        try {
+            const response = await request(
+                `/farmer/analytics` ,
+                'GET',
+                {},
+                true,
+                false,
+                false,
+            )
+            return response;
+        }catch(err){
+            throw err;
+        }
+    }
+    async getAgentAnalytics() {
+        try {
+            const response = await request(
+                `/agent/analytics` ,
+                'GET',
+                {},
+                true,
+                false,
+                false,
+            )
+            return response;
+        }catch(err){
+            throw err;
+        }
+    }
 }
 
 
