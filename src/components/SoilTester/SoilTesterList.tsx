@@ -49,17 +49,17 @@ const SoilTesterList = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "in-progress":
-        return "text-blue-600 "; 
+        return "text-blue-600"; 
       case "assigned":
-        return "text-gray-600  "; 
+        return "text-gray-600"; 
       case "pending":
-        return "text-orange-600  ";
+        return "text-orange-600";
       case "completed":
-        return "text-green-600  "; 
+        return "text-green-600"; 
       case "cancelled":
-        return "text-red-600  "; 
+        return "text-red-600"; 
       default:
-        return "text-gray-600  ";
+        return "text-gray-600";
     }
   };
   
@@ -140,11 +140,11 @@ const SoilTesterList = () => {
                 </div>
 
                 <div className="mt-4 pt-4 border-t flex flex-col gap-3">
-                  <Link to={`/more-details/${tester._id}`}>
+                  {tester.status=="completed"?<Link to={`/land-tests/${tester._id}`}>
                     <button className="border border-1 p-1 rounded text-sm bg-green-600 text-white hover:bg-green-400 hover:text-white">
                       View Result
                     </button>
-                  </Link>
+                  </Link>:<></>}
                   {/* <p className="text-xs text-gray-500">
                     Request Date:{" "}
                     {new Date(tester.requestDate).toLocaleString()}
