@@ -94,7 +94,7 @@ const FarmerLandsDisplay: React.FC<FarmerLandsProps> = ({ lands }) => {
           <div className="p-5">
             <div className="flex justify-between items-start mb-3">
               <div>
-                <h3 className="text-xl font-bold text-gray-800">{land.name}</h3>
+                <h3 className="text-xl font-bold text-gray-800">{land.name} {land._id}</h3>
                 <div className="flex items-center text-sm text-gray-600 mt-1">
                   <MapPin className="w-4 h-4 mr-2 text-green-600" />
                   {land.location.state}

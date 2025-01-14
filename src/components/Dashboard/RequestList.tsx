@@ -8,6 +8,7 @@ import {
   MoreVertical, 
   Filter 
 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 // Comprehensive interface for soil test request
 interface SoilTestRequest {
@@ -165,20 +166,13 @@ const RequestsList: React.FC<SoilTestRequestsProps> = ({
 
               {/* Actions */}
               <div className="flex justify-between items-center mt-4">
-                <button 
-                  onClick={() => toggleRequestExpand(request._id)}
+                <Link 
+                 to={`/land-tests/${request._id}`}
                   className="text-sm text-blue-600 hover:text-blue-800 flex items-center"
                 >
-                  {expandedRequest === request._id ? 'Hide Details' : 'View Details'}
-                </button>
-                {onRequestDetails && (
-                  <button 
-                    onClick={() => onRequestDetails(request)}
-                    className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm hover:bg-green-200 transition"
-                  >
-                    Manage Request
-                  </button>
-                )}
+                  View Details
+                </Link>
+                 
               </div>
             </div>
           </div>
