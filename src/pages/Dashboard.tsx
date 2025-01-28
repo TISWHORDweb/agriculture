@@ -18,12 +18,7 @@ const Dashboard = () => {
   const getAnalytics = async () => {
     const role = localStorage.getItem("role");
     if (role) {
-      let response 
-      if(role === "farmer"){
-      response =await  userService.getFarmerAnalytics()
-      }else{
-        response =await  userService.getAgentAnalytics()
-      }
+      let response =await  userService.getFarmerAnalytics()
 
       if (response) {
         setAnalytics(response.data);
