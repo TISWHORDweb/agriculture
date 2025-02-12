@@ -47,6 +47,7 @@ const SoilTestResult = () => {
       );
       setTestData(response.data.data.requests);
       setRecommendations(response.data.data.recommendations);
+      console.log(response)
     } catch (err) {
       setError("Failed to fetch test data.");
     } finally {
@@ -178,6 +179,7 @@ const SoilTestResult = () => {
   }
 
   const results = testData?.results || {};
+  console.log(testData)
 
   console.log(results)
 
