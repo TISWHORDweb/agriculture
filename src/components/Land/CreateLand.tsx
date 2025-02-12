@@ -12,6 +12,8 @@ import axios from "axios";
 import UserService from "../../api/user.service";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import nigeriaStates from '../../../nigerian_states_tbl.json';
+import nigeriaLga from '../../../lga_tbl.json'; // Import the JSON file
 
 // Updated Zod Schema to match Mongoose model
 const landSchema = z.object({
@@ -45,6 +47,18 @@ interface CreateLandProps {
   onClose: () => void;
 }
 
+interface State {
+  id: string;
+  title: string;
+  capital: string;
+}
+
+interface Lga {
+  id: string;
+  title: string;
+  state: string;
+}
+
 const CreateLand: React.FC<CreateLandProps> = ({ onClose }) => {
   const [formData, setFormData] = useState<Partial<LandFormData>>({});
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -58,6 +72,29 @@ const CreateLand: React.FC<CreateLandProps> = ({ onClose }) => {
   const [error, setError] = useState<string | null>(null); // For error messages
   const userService = new UserService();
   const navigate = useNavigate();
+  const [states, setStates] = useState<State[]>([]);
+  const [lgas, setLgas] = useState<Lga[]>([]);
+  const [filteredLgas, setFilteredLgas] = useState<Lga[]>([]);
+
+  useEffect(() => {
+    // Extract states from the JSON data
+    const statesData = nigeriaStates || [];
+    setStates(statesData);
+
+    // Extract LGAs from the JSON data
+    const lgasData = nigeriaLga || [];
+    setLgas(lgasData);
+  }, []);
+
+  useEffect(() => {
+    // Filter LGAs based on the selected state
+    if (landState) {
+      const filtered = lgas.filter((lga) => lga.state === landState);
+      setFilteredLgas(filtered);
+    } else {
+      setFilteredLgas([]);
+    }
+  }, [landState, lgas]);
 
   const handleInputChange = (
     field: string,
@@ -238,13 +275,18 @@ const CreateLand: React.FC<CreateLandProps> = ({ onClose }) => {
             </label>
             <div className="flex items-center border rounded-lg">
               <MapPin className="ml-3 text-green-600" />
-              <input
-                type="text"
+              <select
                 value={landState}
                 onChange={(e) => setLandState(e.target.value)}
-                placeholder="Enter state"
                 className="w-full p-3 rounded-lg border-none focus:ring-2 focus:ring-green-500 outline-none"
-              />
+              >
+                <option value="">Select State</option>
+                {states.map((state) => (
+                  <option key={state.id} value={state.title}>
+                    {state.title}
+                  </option>
+                ))}
+              </select>
             </div>
             {errors["location.state"] && (
               <p className="text-red-500 text-xs mt-1">
@@ -288,15 +330,21 @@ const CreateLand: React.FC<CreateLandProps> = ({ onClose }) => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               LGA (Optional)
             </label>
-            <input
-              type="text"
+            <select
               value={formData.location?.lga || ""}
               onChange={(e) =>
                 handleInputChange("location", e.target.value, "lga")
               }
-              placeholder="Enter LGA"
               className="w-full p-3 rounded-lg border focus:ring-2 focus:ring-green-500 outline-none"
-            />
+              disabled={!landState}
+            >
+              <option value="">Select LGA</option>
+              {filteredLgas.map((lga) => (
+                <option key={lga.id} value={lga.title}>
+                  {lga.title}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 

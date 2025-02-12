@@ -319,7 +319,7 @@ const SoilTestResult = () => {
           </div>
 
           {/* Recommended Crops Section */}
-          {results.recommendedCrops && results.recommendedCrops.length > 0 && (
+          {results?.recommendedCrops && result?.recommendedCrops?.length > 0 && (
             <div className="mt-12">
               <div className="flex items-center gap-2 mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">
@@ -343,7 +343,7 @@ const SoilTestResult = () => {
             </div>
           )}
 
-          {recommendations.length > 0 && (
+          {recommendations?.length > 0 && (
             <div className="mt-12">
               <div className="flex items-center gap-2 mb-6">
                 <h2 className="text-2xl font-bold text-gray-900">

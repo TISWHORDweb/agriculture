@@ -1,7 +1,9 @@
-import React, { useState, FormEvent, ChangeEvent } from 'react';
+import React, { useState, useEffect, FormEvent, ChangeEvent } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import AuthService from "../../api/auth.service";
 import { toast } from "react-toastify";
+import nigeriaStates from '../../../nigerian_states_tbl.json';
+import nigeriaLga from '../../../lga_tbl.json'; // Import the JSON file
 
 interface RegisterFormData {
   firstName: string;
@@ -19,6 +21,18 @@ interface RegisterFormData {
 
 interface FormErrors {
   [key: string]: string;
+}
+
+interface State {
+  id: string;
+  title: string;
+  capital: string;
+}
+
+interface Lga {
+  id: string;
+  title: string;
+  state: string;
 }
 
 const RegisterForm: React.FC = () => {
@@ -43,12 +57,33 @@ const RegisterForm: React.FC = () => {
     middleName: ''
   });
 
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const [states, setStates] = useState<State[]>([]);
+  const [lgas, setLgas] = useState<Lga[]>([]);
+
+  useEffect(() => {
+    // Extract states from the JSON data
+    const statesData = nigeriaStates || [];
+    setStates(statesData);
+
+    // Extract LGAs from the JSON data
+    const lgasData = nigeriaLga || [];
+    setLgas(lgasData);
+  }, []);
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prevState => ({
       ...prevState,
       [name]: value
     }));
+
+    if (name === 'state') {
+      const selectedState = states.find(state => state.title === value);
+      setFormData(prevState => ({
+        ...prevState,
+        lga: '' // Reset LGA when state changes
+      }));
+    }
 
     if (errors[name]) {
       const newErrors = { ...errors };
@@ -351,10 +386,9 @@ const RegisterForm: React.FC = () => {
               <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">
                 State
               </label>
-              <input
+              <select
                 id="state"
                 name="state"
-                type="text"
                 value={formData.state}
                 onChange={handleInputChange}
                 className={`
@@ -365,9 +399,49 @@ const RegisterForm: React.FC = () => {
                   }
                   shadow-sm h-10 py-2 px-2 text-base
                 `}
-              />
+              >
+                <option value="">Select State</option>
+                {states.map(state => (
+                  <option key={state.id} value={state.title}>
+                    {state.title}
+                  </option>
+                ))}
+              </select>
               {errors.state && (
                 <p className="mt-1 text-sm text-red-600">{errors.state}</p>
+              )}
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="lga" className="block text-sm font-medium text-gray-700 mb-1">
+                Local Government Area
+              </label>
+              <select
+                id="lga"
+                name="lga"
+                value={formData.lga}
+                onChange={handleInputChange}
+                className={`
+                  block w-full rounded-md border
+                  ${errors.lga 
+                    ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500' 
+                    : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
+                  }
+                  shadow-sm h-10 py-2 px-2 text-base
+                `}
+                disabled={!formData.state}
+              >
+                <option value="">Select LGA</option>
+                {lgas
+                  .filter(lga => lga.state === formData.state)
+                  .map(lga => (
+                    <option key={lga.id} value={lga.title}>
+                      {lga.title}
+                    </option>
+                  ))}
+              </select>
+              {errors.lga && (
+                <p className="mt-1 text-sm text-red-600">{errors.lga}</p>
               )}
             </div>
 
@@ -394,20 +468,6 @@ const RegisterForm: React.FC = () => {
                 name="ward"
                 type="text"
                 value={formData.ward}
-                onChange={handleInputChange}
-                className="block w-full rounded-md border-gray-300 shadow-sm h-10 py-2 px-2 text-base"
-              />
-            </div>
-
-            <div className="mb-4">
-              <label htmlFor="lga" className="block text-sm font-medium text-gray-700 mb-1">
-                Local Government Area (Optional)
-              </label>
-              <input
-                id="lga"
-                name="lga"
-                type="text"
-                value={formData.lga}
                 onChange={handleInputChange}
                 className="block w-full rounded-md border-gray-300 shadow-sm h-10 py-2 px-2 text-base"
               />
