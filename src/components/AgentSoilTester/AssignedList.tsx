@@ -127,7 +127,7 @@ const AssignedList = () => {
                       Request Date: {new Date(tester.requestDate).toLocaleString()}
                     </p>
                   <div className="mt-4 ">
-                    <Link to={`/single/result/${tester._id}`}>
+                    <Link to={`/land-tests/${tester._id}`}>
                       <button className=" bg-[#4ADE80] text-white w-full py-2 px-4 rounded-md transition duration-200">
                         View Details
                       </button>

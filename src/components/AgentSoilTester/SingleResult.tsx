@@ -179,9 +179,7 @@ const SoilTestResult = () => {
   }
 
   const results = testData?.results || {};
-  console.log(testData)
 
-  console.log(results)
 
   return (
     <DashboardLayout>

@@ -39,9 +39,8 @@ function App() {
         <Route path="/my-test" element={<AssignedList />} />
         <Route path="/setting/change-password" element={<ChangePassword />} />
         <Route path="/profile" element={<Profile />} />
-        <Route path="/view" element={<ViewResult />} />
+        <Route path="/view/:id" element={<ViewResult />} />
         <Route path="/single/test-request/:id" element={<SingleFarmer />} />
-        <Route path="/single/result/:id" element={<SoilTestResult />} />
         <Route path="/" element={<Navigate to="/login" />} />
       </Routes>
     </Router>
