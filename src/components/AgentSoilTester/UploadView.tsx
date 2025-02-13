@@ -1,15 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Download, Loader } from "lucide-react";
-import { useParams } from "react-router-dom";
-import baseUrl from "../../hook/Network";
-import axios from "axios";
-import asset1 from "../../assets/images/asset2.png";
-import asset2 from "../../assets/images/asset3.png";
 import asset3 from "../../assets/images/asset4.png";
-import asset4 from "../../assets/images/asset5.png";
-import asset5 from "../../assets/images/asset6.png";
-import asset6 from "../../assets/images/asset7.png";
-import asset7 from "../../assets/images/asset8.png";
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 
@@ -31,13 +22,6 @@ interface FarmerInfo {
   ownership: string;
 }
 
-interface FertilizerItem {
-  stage: string;
-  input: string;
-  kgHa: number;
-  bagsHa: number;
-}
-
 interface SoilParameter {
   parameter: string;
   unit: string;
@@ -50,26 +34,14 @@ interface SoilParameter {
 
 interface SoilAnalysisData {
   farmerInfo: FarmerInfo;
-  fertilizer: {
-    rice: FertilizerItem[];
-    maize: FertilizerItem[];
-  };
   soilParameters: SoilParameter[];
 }
 
-const ViewResult: React.FC = () => {
-  const { id } = useParams();
-  const base_url = baseUrl();
-  const [testData, setTestData] = useState(null);
+const UploadView: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [farmer, setFarmer] = useState();
   const [result, setResult] = useState();
-  const [land, setLand] = useState();
   const [request, setRequest] = useState();
-  const [agent, setAgent] = useState();
-  const [comment, setComment] = useState();
-  const [recommendations, setRecommendations] = useState([]);
 
   const getStatus = (result, threshold) => {
     // If threshold is a string like "-30-80", split and parse it
@@ -99,87 +71,27 @@ const ViewResult: React.FC = () => {
     }
   };
 
-  function formatDate(inputDate) {
-    const date = new Date(inputDate); // Parse the ISO 8601 string into a Date object
-
-    const day = date.getDate(); // Get the day of the month
-    const month = date.toLocaleString("default", { month: "short" }); // Get the abbreviated month
-    const year = date.getFullYear(); // Get the full year
-
-    // Format the date as "dd-MMM-yyyy"
-    return `${day < 10 ? "0" : ""}${day}-${month}-${year}`;
-  }
-
-  const fetchTestData = async () => {
-    try {
-      setLoading(true);
-      const storedUser = localStorage.getItem("authToken");
-      const role = localStorage.getItem("role");
-      const endpoint =
-        role === "agent"
-          ? `/agent/request/result/${id}`
-          : `/farmer/test-request/${id}/result`;
-      const response = await axios.get(`${base_url}${endpoint}`, {
-        headers: {
-          Authorization: `Bearer ${storedUser}`,
-        },
-      });
-      setTestData(response.data.data.requests);
-      setRecommendations(response.data.data.recommendations);
-    } catch (err) {
-      setError("Failed to fetch test data.");
-    } finally {
-      setLoading(false);
+  const getFromSessionStorage = (key:any) => {
+    const data = sessionStorage.getItem(key);
+    
+    if (data) {
+      try {
+        return JSON.parse(data); 
+      } catch (error) {
+        return data;  
+      }
     }
+    
+    return null;  
   };
+  
 
   useEffect(() => {
-    fetchTestData();
-  }, [id]);
+    const data = getFromSessionStorage("previewData")
+    setResult(data)
+  }, []);
 
-  useEffect(() => {
-    if (testData) {
-      setFarmer(testData?.request?.farmer);
-      setResult(testData?.results);
-      setAgent(testData?.agent);
-      setComment(testData?.results.comment);
-      setLand(testData?.request.land);
-      setRequest(testData?.request);
-    }
-  }, [testData]);
-
-  console.log(result);
-
-  const riceData = recommendations?.find((item) => item.crop === "RICE");
-  const maizeData = recommendations?.find((item) => item.crop === "MAIZE");
-
-  // Function to transform data into table rows
-  const transformDataToRows = (data) => [
-    {
-      stage: "Pre-Planting",
-      input: data.preplanting.input,
-      kgHa: data.preplanting.kgPerHa,
-      bagsHa: data.preplanting.bagsPerHa,
-    },
-    {
-      stage: "Planting",
-      input: data.planting.input,
-      kgHa: data.planting.kgPerHa,
-      bagsHa: data.planting.bagsPerHa,
-    },
-    {
-      stage: "Top Dress (Urea)",
-      input: data.topDressUrea.input,
-      kgHa: data.topDressUrea.kgPerHa,
-      bagsHa: data.topDressUrea.bagsPerHa,
-    },
-    {
-      stage: "Top Dress (MOP)",
-      input: data.topDressMOP.input,
-      kgHa: data.topDressMOP.kgPerHa,
-      bagsHa: data.topDressMOP.bagsPerHa,
-    },
-  ];
+  console.log(result)
 
   // Example usage:
   const thresholds = {
@@ -200,47 +112,43 @@ const ViewResult: React.FC = () => {
   };
 
   const dummyData: SoilAnalysisData = {
-    farmerInfo: {
-      fieldId: "CDA/BUK LAB KANO",
-      labName: "CDA/BUK LAB KANO",
-    },
     soilParameters: [
       {
         parameter: "PH",
         unit: "(in water)",
-        result: result?.pH,
+        result: result?.ph,
         riceThreshold: "6.0-7.0",
-        riceStatus: getStatus(result?.pH || "0", thresholds["pH Level"].Rice),
+        riceStatus: getStatus(result?.ph || "0", thresholds["pH Level"].Rice),
         maizeThreshold: "6.0-7.0",
-        maizeStatus: getStatus(result?.pH || "0", thresholds["pH Level"].Maize),
+        maizeStatus: getStatus(result?.ph || "0", thresholds["pH Level"].Maize),
       },
       {
         parameter: "Available P",
         unit: "ppm",
-        result: result?.available,
+        result: result?.phosphorus,
         riceThreshold: "30-80",
         riceStatus: getStatus(
-          result?.available || "0",
+          result?.phosphorus || "0",
           thresholds["Available P"].Rice
         ),
         maizeThreshold: "30-80",
         maizeStatus: getStatus(
-          result?.available || "0",
+          result?.phosphorus || "0",
           thresholds["Available P"].Maize
         ),
       },
       {
         parameter: "Exchangeable K",
         unit: "ppm",
-        result: result?.exchangeable,
+        result: result?.potassium,
         riceThreshold: "80-180",
         riceStatus: getStatus(
-          result?.exchangeable || "0",
+          result?.potassium || "0",
           thresholds["Exchangeable K"].Rice
         ),
         maizeThreshold: "85-200",
         maizeStatus: getStatus(
-          result?.exchangeable || "0",
+          result?.potassium || "0",
           thresholds["Exchangeable K"].Maize
         ),
       },
@@ -334,15 +242,15 @@ const ViewResult: React.FC = () => {
       {
         parameter: "Total Nitrogen",
         unit: "ppm",
-        result: result?.totalNitrogen,
+        result: result?.nitrogen,
         riceThreshold: "60-150",
         riceStatus: getStatus(
-          result?.totalNitrogen || "0",
+          result?.nitrogen || "0",
           thresholds["Total Nitrogen"].Rice
         ),
         maizeThreshold: "50-100",
         maizeStatus: getStatus(
-          result?.totalNitrogen || "0",
+          result?.nitrogen || "0",
           thresholds["Total Nitrogen"].Maize
         ),
       },
@@ -373,45 +281,14 @@ const ViewResult: React.FC = () => {
       {
         parameter: "Soil",
         unit: "Texture",
-        result: result?.soilTexture,
-        riceThreshold: result?.soilTexture,
+        result: result?.texture,
+        riceThreshold: result?.texture,
         riceStatus: "",
-        maizeThreshold: result?.soilTexture,
+        maizeThreshold: result?.texture,
         maizeStatus: "",
       },
     ],
   };
-
-  const stages = [
-    {
-      title: "Pre-Planting",
-      description: comment?.preplanting,
-      titleColor: "text-emerald-500",
-      stageImage: asset4,
-      weatherImage: asset1,
-    },
-    {
-      title: "Planting",
-      description: comment?.planting,
-      titleColor: "text-emerald-500",
-      stageImage: asset7,
-      weatherImage: asset6,
-    },
-    {
-      title: "Top Dress (Urea)",
-      description: comment?.topDressUrea,
-      titleColor: "text-emerald-500",
-      stageImage: asset2,
-      weatherImage: asset5,
-    },
-    {
-      title: "Top Dress (MOP)",
-      description: comment?.topDressMOP,
-      titleColor: "text-emerald-500",
-      stageImage: asset2,
-      weatherImage: asset5,
-    },
-  ];
 
   const contentRef = useRef<HTMLDivElement>(null);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
@@ -531,216 +408,37 @@ const ViewResult: React.FC = () => {
             <div className="space-y-4 text-sm">
               <div className="flex items-center gap-2">
                 <span className="font-semibold text-[#3c5965]">
-                  Farmer Name:
+                  Unique ID:
                 </span>{" "}
-                {farmer?.profile.firstName + " " + farmer?.profile.lastName}
+                {result?.farmerInfo.uniqueId}
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-[#3c5965]">Phone:</span>{" "}
-                {farmer?.profile.contact}
+                <span className="font-semibold text-[#3c5965]">Latitude:</span>{" "}
+                {result?.farmerInfo.latitude}
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-[#3c5965]">Email:</span>{" "}
-                {farmer?.email}
+                <span className="font-semibold text-[#3c5965]">Longitude:</span>{" "}
+                {result?.farmerInfo.longitude}
               </div>
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-[#3c5965]">State:</span>{" "}
-                {farmer?.location.state}
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-[#3c5965]">LGA:</span>{" "}
-                {farmer?.location.lga}
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-[#3c5965]">Ward:</span>{" "}
-                {farmer?.location.ward}
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-[#3c5965]">
-                  Coordinates:
-                </span>{" "}
-                {land?.location.coordinates.latitude +
-                  " " +
-                  land?.location?.coordinates?.longtitude}
+                <span className="font-semibold text-[#3c5965]">Source:</span>{" "}
+                {result?.source}
               </div>
             </div>
             <div className="space-y-4 text-sm">
               <div>
-                <span className="font-semibold text-[#3c5965]">Field ID:</span>{" "}
-                {dummyData.farmerInfo.fieldId}
+                <span className="font-semibold text-[#3c5965]">State:</span>{" "}
+                {result?.farmerInfo.state}
               </div>
               <div>
-                <span className="font-semibold text-[#3c5965]">Lab Name:</span>{" "}
-                {dummyData.farmerInfo.labName}
+                <span className="font-semibold text-[#3c5965]">Ward:</span>{" "}
+                {result?.farmerInfo.ward}
               </div>
               <div>
-                <span className="font-semibold text-[#3c5965]">
-                  Sampling Date:
-                </span>{" "}
-                {formatDate(request?.createdAt)}
-              </div>
-              <div>
-                <span className="font-semibold text-[#3c5965]">
-                  Analysis Date:
-                </span>{" "}
-                {formatDate(testData?.createdAt)}
-              </div>
-              <div>
-                <span className="font-semibold text-[#3c5965]">Sampler:</span>{" "}
-                {agent?.profile.firstName + " " + agent?.profile.lastName}
-              </div>
-              <div>
-                <span className="font-semibold text-[#3c5965]">
-                  Farm Ownership:
-                </span>{" "}
-                    <span className="capitalize">{land?.ownership}</span>
+                <span className="font-semibold text-[#3c5965]">LGA:</span>{" "}
+                {result?.farmerInfo.lga}
               </div>
             </div>
-          </div>
-        </div>
-        <hr className="border-t-2 border-dashed border-gray-400 my-4" />
-
-        {/* Fertilizer Recommendations */}
-        <div className="space-y-6">
-          {/* Rice Table */}
-          {riceData && (
-            <div>
-              <h3 className="text-lg font-semibold mb-3">
-                <span className="text-[#3c5965]">
-                  {" "}
-                  Fertilizer Recommendations -{" "}
-                </span>{" "}
-                <span className="text-green-700">RICE</span>
-              </h3>
-              <div className="overflow-x-auto">
-                <table className="min-w-full bg-white rounded-lg shadow-md">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-sm text-[#3c5965] font-semibold uppercase tracking-wider ">
-                        Stage
-                      </th>
-                      <th className="px-6 py-3 text-left text-sm text-[#3c5965] font-semibold  uppercase tracking-wider">
-                        Input
-                      </th>
-                      <th className="px-6 py-3 text-right text-sm  text-[#3c5965] font-semibold  uppercase tracking-wider">
-                        Kg/Ha
-                      </th>
-                      <th className="px-6 py-3 text-right text-sm text-[#3c5965] font-semibold  uppercase tracking-wider">
-                        Bags/Ha (50kg)
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {transformDataToRows(riceData).map((item, index) => (
-                      <tr key={index} className="hover:bg-gray-50 text-sm">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {item.stage}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {item.input}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right">
-                          {item.kgHa}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right">
-                          {item.bagsHa}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {/* Maize Table */}
-          {maizeData && (
-            <div>
-              <h3 className="text-lg font-semibold mb-3">
-                <span className="text-[#3c5965]">
-                  {" "}
-                  Fertilizer Recommendations -{" "}
-                </span>{" "}
-                <span className="text-green-700">MAIZE</span>
-              </h3>
-              <div className="overflow-x-auto">
-                <table className="min-w-full bg-white rounded-lg shadow-md">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-sm  text-[#3c5965] font-semibold uppercase tracking-wider">
-                        Stage
-                      </th>
-                      <th className="px-6 py-3 text-left text-sm  text-[#3c5965] font-semibold  uppercase tracking-wider">
-                        Input
-                      </th>
-                      <th className="px-6 py-3 text-right text-sm  text-[#3c5965] font-semibold  uppercase tracking-wider">
-                        Kg/Ha
-                      </th>
-                      <th className="px-6 py-3 text-right text-sm  text-[#3c5965] font-semibold uppercase tracking-wider">
-                        Bags/Ha (50kg)
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {transformDataToRows(maizeData).map((item, index) => (
-                      <tr key={index} className="hover:bg-gray-50 text-sm">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {item.stage}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          {item.input}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right">
-                          {item.kgHa}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-right">
-                          {item.bagsHa}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <hr className="border-t-2 border-dashed border-gray-400 my-4" />
-
-        <div className="w-full max-w-6xl mx-auto px-4 py-8 bg-[#f3f4f6]">
-          <div className="grid grid-cols-3 gap-4  text-slate-800 mb-5 text-1xl font-bold mb-2 text-[#3c5965] ">
-            <div className="text-left">STAGE</div>
-            <div className="text-left">COMMENT</div>
-            <div className="text-right">WEATHER</div>
-          </div>
-
-          <div className="space-y-6">
-            {stages.map((stage, index) => (
-              <div
-                key={index}
-                className="grid grid-cols-[80px_1fr_80px] gap-4 md:gap-32 items-center"
-              >
-                <div className="w-20 h-20 bg-gray-100 rounded-lg">
-                  <img src={stage.stageImage} alt="" />
-                </div>
-
-                <div>
-                  <h3
-                    className={`${stage.titleColor} text-lg font-medium mb-1`}
-                  >
-                    {stage.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm">{stage.description}</p>
-                </div>
-
-                <div className="w-20 h-20 flex justify-center items-center">
-                  {/* Weather icon placeholder */}
-                  <div className="w-12 h-12 bg-gray-100">
-                    <img src={stage.weatherImage} alt="" />
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
 
@@ -853,4 +551,4 @@ const ViewResult: React.FC = () => {
   );
 };
 
-export default ViewResult;
+export default UploadView;

@@ -21,6 +21,8 @@ import AssignedList from "./components/AgentSoilTester/AssignedList";
 import SoilTestResult from "./components/AgentSoilTester/SingleResult";
 import SingleFarmer from "./components/AgentSoilTester/SingleFarmer";
 import ViewResult from "./components/AgentSoilTester/ViewResult";
+import ResultUpload from "./components/AgentSoilTester/ResultUpload";
+import UploadView from "./components/AgentSoilTester/UploadView";
 
 function App() {
   return (
@@ -40,6 +42,8 @@ function App() {
         <Route path="/setting/change-password" element={<ChangePassword />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/view/:id" element={<ViewResult />} />
+        <Route path="/result/upload" element={<ResultUpload />} />
+        <Route path="/result/preview" element={<UploadView />} />
         <Route path="/single/test-request/:id" element={<SingleFarmer />} />
         <Route path="/" element={<Navigate to="/login" />} />
       </Routes>
