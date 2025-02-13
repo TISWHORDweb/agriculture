@@ -116,11 +116,11 @@ const UploadView: React.FC = () => {
       {
         parameter: "PH",
         unit: "(in water)",
-        result: result?.ph,
+        result: result?.pH,
         riceThreshold: "6.0-7.0",
-        riceStatus: getStatus(result?.ph || "0", thresholds["pH Level"].Rice),
+        riceStatus: getStatus(result?.pH || "0", thresholds["pH Level"].Rice),
         maizeThreshold: "6.0-7.0",
-        maizeStatus: getStatus(result?.ph || "0", thresholds["pH Level"].Maize),
+        maizeStatus: getStatus(result?.pH || "0", thresholds["pH Level"].Maize),
       },
       {
         parameter: "Available P",
