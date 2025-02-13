@@ -12,11 +12,17 @@ const ResultUpload = () => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const base_url = baseUrl();
 
+  const storedUser = localStorage.getItem("authToken");
+
   useEffect(() => {
     const fetchSoilData = async () => {
       try {
         const endpoint = `/admin/test/all`;
-        const response = await axios.get(`${base_url}${endpoint}`);
+        const response = await axios.get(`${base_url}${endpoint}`, {
+          headers: {
+            Authorization: `Bearer ${storedUser}`,
+          },
+        });
         setData(response.data.data);
       } catch (error) {
         console.error("Error fetching soil data:", error);
@@ -27,10 +33,11 @@ const ResultUpload = () => {
   }, []);
 
   const BATCH_SIZE = 50; 
+  const adminId = "675abdb7894fc6f5196d3061"
 
   const transformData = (rawData) => {
     return rawData.map((row) => ({
-      adminId: "675abdb7894fc6f5196d3061",
+      adminId: adminId,
       uniqueId: row["Unique ID"],
       state: row["State"],
       lga: row["LGA"],
@@ -61,7 +68,12 @@ const ResultUpload = () => {
       const url = `/admin/test/data`;
       await axios.post(
         `${base_url}${url}`,
-        { soilData: batch }
+        { soilData: batch },
+        {
+          headers: {
+            Authorization: `Bearer ${storedUser}`,
+          }
+        }
       );
     } catch (error) {
       throw new Error(`Error uploading batch: ${error.message}`);
