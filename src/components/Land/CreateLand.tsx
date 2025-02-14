@@ -192,10 +192,7 @@ const CreateLand: React.FC<CreateLandProps> = ({ onClose }) => {
       }
 
       toast.success(response?.message);
-      localStorage.setItem("authToken", response.data.token);
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 1000);
+     window.location.reload() 
     } catch (error: any) {
       setError(
         error.response?.data?.message || "Login failed. Please try again."
