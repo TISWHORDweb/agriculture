@@ -29,7 +29,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/*" element={<Login />} />
-        <Route path="/register/:role" element={<Register />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/agent/dashboard" element={<AgentDashboard />} />
         <Route path="/land-tests" element={<SoilTesterList />} />

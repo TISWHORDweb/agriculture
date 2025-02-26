@@ -3,14 +3,15 @@ import { useNavigate, useParams } from 'react-router-dom';
 import AuthService from "../../api/auth.service";
 import { toast } from "react-toastify";
 import nigeriaStates from '../../../nigerian_states_tbl.json';
-import nigeriaLga from '../../../lga_tbl.json'; // Import the JSON file
+import nigeriaLga from '../../../lga_tbl.json';
 
 const RegisterForm = () => {
   const navigate = useNavigate();
   const authService = new AuthService();
-  const { role } = useParams();
+  const { role: initialRole } = useParams();
 
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0); // Step 0: Role selection
+  const [selectedRole, setSelectedRole] = useState(initialRole || ''); // Track selected role
   const [errors, setErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -48,7 +49,6 @@ const RegisterForm = () => {
     }));
 
     if (name === 'state') {
-      const selectedState = states.find(state => state.title === value);
       setFormData(prevState => ({
         ...prevState,
         lga: '' // Reset LGA when state changes
@@ -60,6 +60,11 @@ const RegisterForm = () => {
       delete newErrors[name];
       setErrors(newErrors);
     }
+  };
+
+  const handleRoleSelection = (role) => {
+    setSelectedRole(role);
+    setStep(1); // Move to the next step (registration form)
   };
 
   const validateFirstStep = () => {
@@ -148,7 +153,7 @@ const RegisterForm = () => {
         middleName: formData.middleName,
         email: formData.email,
         password: formData.password,
-        role: role || "farmer",
+        role: selectedRole || "farmer", // Use selectedRole
         location: {
           address: formData.address,
           state: formData.state,
@@ -176,11 +181,37 @@ const RegisterForm = () => {
   };
 
   return (
-    <div className="">
+    <div className="max-w-lg mx-auto p-6 ">
       <form onSubmit={handleSubmit} className="space-y-4">
         {errors.submit && (
           <div className="bg-red-50 border border-red-300 text-red-700 px-4 py-3 rounded relative" role="alert">
             {errors.submit}
+          </div>
+        )}
+
+        {step === 0 && (
+          <div>
+            <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">
+              Select Your Role
+            </h2>
+            <div className=" gap-4">
+              <button
+                type="button"
+                onClick={() => handleRoleSelection('farmer')}
+                className="p-6 bg-green-50 border border-green-200 rounded-lg text-center w-full mb-3 hover:bg-green-100 transition-colors"
+              >
+                <h3 className="text-xl font-semibold text-green-700">Farmer</h3>
+                <p className="text-gray-600">Register as a farmer</p>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleRoleSelection('agent')}
+                className="p-6 bg-blue-50 border border-blue-200 rounded-lg text-center w-full hover:bg-blue-100 transition-colors"
+              >
+                <h3 className="text-xl font-semibold text-blue-700">Agent</h3>
+                <p className="text-gray-600">Register as an agent</p>
+              </button>
+            </div>
           </div>
         )}
 
