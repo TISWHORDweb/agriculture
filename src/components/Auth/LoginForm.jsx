@@ -37,6 +37,11 @@ const LoginForm = () => {
         return;
       }
 
+      if (response.data.user.status === false) {
+        toast.warning("Sorry, your account is not active. Please contact admin.");
+        return;
+      }
+
       toast.success(response?.message);
       localStorage.setItem("authToken", response.data.token);
       localStorage.setItem("role", response.data.user.role);
