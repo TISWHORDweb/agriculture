@@ -20,7 +20,7 @@ const getLandTypeIcon = (landType) => {
 };
 
 const FarmerLandsDisplay = ({ lands }) => {
-  const [selectedLand, setSelectedLand] = useState<string | null>(null);
+  const [selectedLand, setSelectedLand] = useState(null);
 
   const handleLandDetails = (landId) => {
     setSelectedLand(selectedLand === landId ? null : landId);

@@ -25,6 +25,7 @@ const RegisterForm = () => {
     address: '',
     ward: '',
     lga: '',
+    nin: '',
     middleName: ''
   });
 
@@ -69,32 +70,32 @@ const RegisterForm = () => {
 
   const validateFirstStep = () => {
     const newErrors = {};
-    
+
     if (!formData.firstName.trim()) {
       newErrors.firstName = "First name is required";
     } else if (formData.firstName.length < 2) {
       newErrors.firstName = "First name must be at least 2 characters";
     }
-    
+
     if (!formData.lastName.trim()) {
       newErrors.lastName = "Last name is required";
     } else if (formData.lastName.length < 2) {
       newErrors.lastName = "Last name must be at least 2 characters";
     }
-    
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
     } else if (!emailRegex.test(formData.email)) {
       newErrors.email = "Invalid email address";
     }
-    
+
     if (!formData.password) {
       newErrors.password = "Password is required";
     } else if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
     }
-    
+
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords don't match";
     }
@@ -104,11 +105,11 @@ const RegisterForm = () => {
 
   const validateSecondStep = () => {
     const newErrors = {};
-    
+
     if (!formData.state.trim()) {
       newErrors.state = "State is required";
     }
-    
+
     if (!formData.contact.trim()) {
       newErrors.contact = "Contact information is required";
     } else if (formData.contact.length < 6) {
@@ -134,7 +135,7 @@ const RegisterForm = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     const firstStepErrors = validateFirstStep();
     const secondStepErrors = validateSecondStep();
     const combinedErrors = { ...firstStepErrors, ...secondStepErrors };
@@ -153,6 +154,7 @@ const RegisterForm = () => {
         middleName: formData.middleName,
         email: formData.email,
         password: formData.password,
+        nin: formData.nin,
         role: selectedRole || "farmer", // Use selectedRole
         location: {
           address: formData.address,
@@ -233,8 +235,8 @@ const RegisterForm = () => {
                 onChange={handleInputChange}
                 className={`
                   block w-full rounded-md border
-                  ${errors.firstName 
-                    ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500' 
+                  ${errors.firstName
+                    ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500'
                     : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
                   }
                   shadow-sm h-10 py-2 px-2 text-base
@@ -257,8 +259,8 @@ const RegisterForm = () => {
                 onChange={handleInputChange}
                 className={`
                   block w-full rounded-md border
-                  ${errors.lastName 
-                    ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500' 
+                  ${errors.lastName
+                    ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500'
                     : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
                   }
                   shadow-sm h-10 py-2 px-2 text-base
@@ -281,8 +283,8 @@ const RegisterForm = () => {
                 onChange={handleInputChange}
                 className={`
                   block w-full rounded-md border
-                  ${errors.email 
-                    ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500' 
+                  ${errors.email
+                    ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500'
                     : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
                   }
                   shadow-sm h-10 py-2 px-2 text-base
@@ -305,8 +307,8 @@ const RegisterForm = () => {
                 onChange={handleInputChange}
                 className={`
                   block w-full rounded-md border
-                  ${errors.password 
-                    ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500' 
+                  ${errors.password
+                    ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500'
                     : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
                   }
                   shadow-sm h-10 py-2 px-2 text-base
@@ -329,8 +331,8 @@ const RegisterForm = () => {
                 onChange={handleInputChange}
                 className={`
                   block w-full rounded-md border
-                  ${errors.confirmPassword 
-                    ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500' 
+                  ${errors.confirmPassword
+                    ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500'
                     : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
                   }
                   shadow-sm h-10 py-2 px-2 text-base
@@ -371,8 +373,8 @@ const RegisterForm = () => {
                 onChange={handleInputChange}
                 className={`
                   block w-full rounded-md border
-                  ${errors.contact 
-                    ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500' 
+                  ${errors.contact
+                    ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500'
                     : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
                   }
                   shadow-sm h-10 py-2 px-2 text-base
@@ -380,6 +382,30 @@ const RegisterForm = () => {
               />
               {errors.contact && (
                 <p className="mt-1 text-sm text-red-600">{errors.contact}</p>
+              )}
+            </div>
+
+            <div className="mb-4">
+              <label htmlFor="nin" className="block text-sm font-medium text-gray-700 mb-1">
+                NIN
+              </label>
+              <input
+                id="nin"
+                name="nin"
+                type="text"
+                value={formData.nin}
+                onChange={handleInputChange}
+                className={`
+                  block w-full rounded-md border
+                  ${errors.nin
+                    ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500'
+                    : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
+                  }
+                  shadow-sm h-10 py-2 px-2 text-base
+                `}
+              />
+              {errors.nin && (
+                <p className="mt-1 text-sm text-red-600">{errors.nin}</p>
               )}
             </div>
 
@@ -394,8 +420,8 @@ const RegisterForm = () => {
                 onChange={handleInputChange}
                 className={`
                   block w-full rounded-md border
-                  ${errors.state 
-                    ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500' 
+                  ${errors.state
+                    ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500'
                     : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
                   }
                   shadow-sm h-10 py-2 px-2 text-base
@@ -424,8 +450,8 @@ const RegisterForm = () => {
                 onChange={handleInputChange}
                 className={`
                   block w-full rounded-md border
-                  ${errors.lga 
-                    ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500' 
+                  ${errors.lga
+                    ? 'border-red-300 text-red-900 focus:border-red-500 focus:ring-red-500'
                     : 'border-gray-300 focus:border-green-500 focus:ring-green-500'
                   }
                   shadow-sm h-10 py-2 px-2 text-base
@@ -487,8 +513,8 @@ const RegisterForm = () => {
                 disabled={isSubmitting}
                 className={`
                   px-6 py-2 text-white rounded-md transition-colors
-                  ${isSubmitting 
-                    ? 'bg-gray-400 cursor-not-allowed' 
+                  ${isSubmitting
+                    ? 'bg-gray-400 cursor-not-allowed'
                     : 'bg-green-600 hover:bg-green-700'
                   }
                 `}
