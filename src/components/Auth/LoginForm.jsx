@@ -46,9 +46,7 @@ const LoginForm = () => {
       localStorage.setItem("authToken", response.data.token);
       localStorage.setItem("role", response.data.user.role);
       setTimeout(() => {
-        if (response.data.user.role === "agent") {
-          navigate("/agent/dashboard");
-        } else if (response.data.user.role === "admin") {
+        if (response.data.user.role === "admin") {
           toast.warn("Admin is not allowed to access this site");
         } else {
           navigate("/dashboard");

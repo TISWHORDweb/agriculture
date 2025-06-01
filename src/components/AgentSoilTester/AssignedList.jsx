@@ -77,11 +77,14 @@ const AssignedList = () => {
     );
   }
 
+  const defaultAvatar = (first, last) => {
+    return `https://ui-avatars.com/api/?name=${first}+${last}&background=random&size=200`;
+  }
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto px-4 mt-5">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-semibold">Assigned Soil Testers</h1>
+          <h1 className="text-3xl font-semibold">Assigned Soil Tests</h1>
         </div>
 
         {soilTesters.length > 0 ? (
@@ -89,9 +92,9 @@ const AssignedList = () => {
             {soilTesters.map((tester) => (
               <div key={tester._id} className="bg-white rounded-lg shadow-lg overflow-hidden">
                 <div className="relative">
-                  <img src={farm} alt="farm image" className="w-full h-48 object-cover rounded-t-lg" />
+                  <img src={tester.land.image} alt="farm image" className="w-full h-48 object-cover rounded-t-lg" />
                   <div className="absolute top-4 left-4 bg-white p-2 rounded-full border-2 border-white shadow-md">
-                    <img src={farmer} alt="Farmer" className="w-16 h-16 object-cover rounded-full border" />
+                    <img src={tester.farmer.image || defaultAvatar(tester.farmer.profile.firstName, tester.farmer.profile.lastName)} alt="Farmer" className="w-16 h-16 object-cover rounded-full border" />
                   </div>
                 </div>
 
@@ -103,7 +106,7 @@ const AssignedList = () => {
                   <p className="text-gray-500 text-sm">
                     <span className="text-gray-400">Coordinates:</span> Lat: {tester.land.location.coordinates.latitude}, Lon: {tester.land.location.coordinates.longitude}
                   </p>
-                  
+
                   <div className="flex justify-between items-center mt-4">
                     <span className="text-gray-500 font-semibold">
                       Land Size: {tester.land.totalArea.value} {tester.land.totalArea.unit}
@@ -117,14 +120,14 @@ const AssignedList = () => {
 
                   <p className="text-xs text-gray-500 mt-2">Additional Note: {tester.additionalNotes || "No additional notes"}</p>
                   <p className="text-xs mt-2 text-gray-400">
-                      Request Date: {new Date(tester.requestDate).toLocaleString()}
-                    </p>
+                    Request Date: {new Date(tester.requestDate).toLocaleString()}
+                  </p>
                   <div className="mt-4 ">
                     <Link to={`/land-tests/${tester._id}`}>
                       <button className=" bg-[#4ADE80] text-white w-full py-2 px-4 rounded-md transition duration-200">
                         View Details
                       </button>
-                    </Link> 
+                    </Link>
                   </div>
                 </div>
               </div>

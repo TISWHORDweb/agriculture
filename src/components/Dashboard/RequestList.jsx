@@ -74,11 +74,11 @@ const RequestsList = ({
             </button>
           ))}
         </div>
-        <Filter className="w-5 h-5 text-gray-600" />
+        {/* <Filter className="w-5 h-5 text-gray-600" /> */}
       </div>
 
       {/* Requests Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
         {filteredRequests.map((request) => (
           <div 
             key={request._id} 

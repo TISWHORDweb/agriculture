@@ -319,12 +319,187 @@ const UploadView = () => {
   };
 
   return (
-    <div ref={contentRef}>
-      {/* Your JSX here */}
-      <button onClick={generatePDF}>
-        {isGeneratingPDF ? <Loader /> : <Download />}
-      </button>
-    </div>
+    <>
+      {/* Add Download Button */}
+      <div className="fixed bottom-8 right-8 z-50">
+        <button
+          onClick={generatePDF}
+          disabled={isGeneratingPDF}
+          className={`flex items-center gap-2 ${
+            isGeneratingPDF 
+              ? 'bg-gray-400 cursor-not-allowed' 
+              : 'bg-green-600 hover:bg-green-700'
+          } text-white px-4 py-2 rounded-lg shadow-lg transition-colors duration-200`}
+        >
+          {isGeneratingPDF ? (
+            <>
+              <Loader className="animate-spin" size={20} />
+              Generating PDF...
+            </>
+          ) : (
+            <>
+              <Download size={20} />
+              Download PDF
+            </>
+          )}
+        </button>
+      </div>
+
+      <div ref={contentRef} className="bg-[#f0f0f0] max-w-6xl mx-auto p-4 space-y-6">
+        {/* Header */}
+        <div className="flex flex-col items-center justify-center text-center mb-6">
+          <img src={asset3} alt="" className="w-32" />
+          <h1 className="text-2xl font-bold mb-2 text-[#3c5965] mt-3">
+            Federal Ministry of Agriculture and Food Security
+          </h1>
+        </div>
+
+        {/* Farmer Information */}
+        <div className=" rounded-lg p-6">
+          <div className="flex justify-between">
+            <div className="space-y-4 text-sm">
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-[#3c5965]">
+                  Unique ID:
+                </span>{" "}
+                {result?.farmerInfo.uniqueId}
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-[#3c5965]">Latitude:</span>{" "}
+                {result?.farmerInfo.latitude}
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-[#3c5965]">Longitude:</span>{" "}
+                {result?.farmerInfo.longitude}
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-semibold text-[#3c5965]">Source:</span>{" "}
+                {result?.source}
+              </div>
+            </div>
+            <div className="space-y-4 text-sm">
+              <div>
+                <span className="font-semibold text-[#3c5965]">State:</span>{" "}
+                {result?.farmerInfo.state}
+              </div>
+              <div>
+                <span className="font-semibold text-[#3c5965]">Ward:</span>{" "}
+                {result?.farmerInfo.ward}
+              </div>
+              <div>
+                <span className="font-semibold text-[#3c5965]">LGA:</span>{" "}
+                {result?.farmerInfo.lga}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <hr className="border-t-2 border-dashed border-gray-400 my-4" />
+        {/* Soil Parameters */}
+        <div className="space-y-6">
+          <h3 className="text-xl font-semibold mb-3">Soil Analysis Results</h3>
+          <div className="overflow-x-auto">
+            <table className="min-w-full bg-white rounded-lg shadow-md">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Parameter
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Unit
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Results
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Rice Threshold
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Rice Status
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Maize Threshold
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Maize Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {dummyData.soilParameters.map((param, index) => (
+                  <tr key={index} className="hover:bg-gray-50 text-sm">
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {param.parameter}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {param.unit}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {param.result}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {param.riceThreshold}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`px-2 py-2 rounded-full text-xs ${getStatusColor(
+                          param.riceStatus
+                        )}`}
+                      >
+                        {param.riceStatus}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {param.maizeThreshold}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <span
+                        className={`px-2 py-2 rounded-full text-xs ${getStatusColor(
+                          param.maizeStatus
+                        )}`}
+                      >
+                        {param.maizeStatus}
+                      </span>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div className="text-sm text-gray-600 mt-8 p-4 border-t">
+          <p className="mb-2">For Enquiries Contact:</p>
+          <p>Federal Ministry of Agriculture and Food Security</p>
+          <p>Department of Agricultural Land and Climate Management Services</p>
+          <p>Kapital Road, Area 11</p>
+          <p>Phone: 08030000000, 081300000000</p>
+          <p>Email: nfshcs@alccms.com.ng</p>
+          <br />
+          <br />
+          <p>
+            Disclaimer: These fertilizer recommendations are only valid for the
+            sample presented, specific crop type, yield target and estimated
+            fertilizer recovery. Please also note that the recommendations
+            provide indicative rates only and should be validated at farm level
+            through fertilizer trials. Whilst we have taken all reasonable care
+            to ensure that our recommendations are accurate, we have not taken
+            into account other factors that could greatly reduce crop nutrient
+            uptake including but not limited to soil moisture, root diseases,
+            nematodes, water logging, compaction, acidity, fertilizer placement
+            and other management factors. Therefore, we accept no liability for
+            any loss or damage arising directly or indirectly from the use of
+            the fertilizers and under no circumstances whatsoever shall we be
+            liable for any special, incidental or consequential damages which
+            may arise therefrom. This document cannot be reproduced, without
+            prior written approval of the company.
+          </p>
+          <br />
+          <p>©Powered by FMAFS</p>
+        </div>
+      </div>
+    </>
   );
 };
 

@@ -11,13 +11,13 @@ import Dashboard from "./pages/Dashboard";
 import SoilTesterList from "./components/SoilTester/SoilTesterList";
 import AgentSoilTesterList from "./components/AgentSoilTester/SoilTesterList";
 import LandList from "./components/Land/LandList";
-import Account from "./components/Account/Account";
+// import Account from "./components/Account/Account";
 import TestView from "./components/SoilTester/TestView";
-import AgentDashboard from "./pages/AgentDashboard";
+// import AgentDashboard from "./pages/AgentDashboard";
 import Profile from "./pages/Profile";
 import ChangePassword from "./components/Auth/ChangwPassword";
 import AssignedList from "./components/AgentSoilTester/AssignedList";
-import SoilTestResult from "./components/AgentSoilTester/SingleResult";
+// import SoilTestResult from "./components/AgentSoilTester/SingleResult";
 import SingleFarmer from "./components/AgentSoilTester/SingleFarmer";
 import ViewResult from "./components/AgentSoilTester/ViewResult";
 import ResultUpload from "./components/AgentSoilTester/ResultUpload";
@@ -31,7 +31,6 @@ function App() {
         <Route path="/*" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/agent/dashboard" element={<AgentDashboard />} />
         <Route path="/land-tests" element={<SoilTesterList />} />
         <Route path="/land-tests/:id" element={<TestView />} />
         <Route path="/land" element={<LandList />} />

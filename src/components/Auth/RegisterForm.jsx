@@ -225,7 +225,7 @@ const RegisterForm = () => {
 
             <div className="mb-4">
               <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 mb-1">
-                First Name
+                First Name <span className="text-red-500">*</span>
               </label>
               <input
                 id="firstName"
@@ -249,7 +249,7 @@ const RegisterForm = () => {
 
             <div className="mb-4">
               <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 mb-1">
-                Last Name
+                Last Name <span className="text-red-500">*</span>
               </label>
               <input
                 id="lastName"
@@ -273,7 +273,7 @@ const RegisterForm = () => {
 
             <div className="mb-4">
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                Email
+                Email <span className="text-red-500">*</span>
               </label>
               <input
                 id="email"
@@ -297,7 +297,7 @@ const RegisterForm = () => {
 
             <div className="mb-4">
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
-                Password
+                Password <span className="text-red-500">*</span>
               </label>
               <input
                 id="password"
@@ -321,7 +321,7 @@ const RegisterForm = () => {
 
             <div className="mb-4">
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
-                Confirm Password
+                Confirm Password <span className="text-red-500">*</span>
               </label>
               <input
                 id="confirmPassword"
@@ -363,7 +363,7 @@ const RegisterForm = () => {
 
             <div className="mb-4">
               <label htmlFor="contact" className="block text-sm font-medium text-gray-700 mb-1">
-                Contact Number
+                Contact Number <span className="text-red-500">*</span>
               </label>
               <input
                 id="contact"
@@ -411,7 +411,7 @@ const RegisterForm = () => {
 
             <div className="mb-4">
               <label htmlFor="state" className="block text-sm font-medium text-gray-700 mb-1">
-                State
+                State <span className="text-red-500">*</span>
               </label>
               <select
                 id="state"
@@ -441,7 +441,7 @@ const RegisterForm = () => {
 
             <div className="mb-4">
               <label htmlFor="lga" className="block text-sm font-medium text-gray-700 mb-1">
-                Local Government Area
+                Local Government Area <span className="text-red-500">*</span>
               </label>
               <select
                 id="lga"

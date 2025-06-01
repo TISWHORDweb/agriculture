@@ -1,10 +1,11 @@
 import React from 'react';
+import farm from "../..//assets/farm.jpg";
 
 const FarmPreview = () => {
   return (
-    <div className="relative h-48 rounded-xl overflow-hidden">
+    <div className="relative rounded-xl overflow-hidden !max-h-48 w-full h-auto">
       <img
-        src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1000&q=80"
+        src={farm}
         alt="Farm landscape"
         className="w-full h-full object-cover"
       />

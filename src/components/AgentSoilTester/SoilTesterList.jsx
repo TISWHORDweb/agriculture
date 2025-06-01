@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
-import { Activity, Droplets, MapPin, User } from "lucide-react";
+import { Activity, Droplets, MapPin, User, LandPlot } from "lucide-react";
 import DashboardLayout from "../Layout/DashboardLayout";
 import Thumb from "../../assets/missing-data-vector-49849220-removebg-preview.png";
-import farm from "../../assets/images/pexels-photo-259280.jpeg";
-import farmer from "../../assets/images/pexels-photo-916406.jpeg";
 import baseUrl from "../../hook/Network";
 
 const SoilTesterList = () => {
@@ -57,6 +55,11 @@ const SoilTesterList = () => {
     }
   };
 
+  // Function to generate default avatar
+  const getDefaultAvatar = (name) => {
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=random&size=200`;
+  };
+
   if (loading) {
     return (
       <DashboardLayout>
@@ -80,6 +83,16 @@ const SoilTesterList = () => {
   return (
     <DashboardLayout>
       <div className="max-w-7xl mx-auto px-6 sm:px-8 mt-5">
+        {/* New Header Section */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-800">Soil Testing Requests</h1>
+          <p className="text-gray-600 mt-2">
+            {soilTesters.length > 0 
+              ? `You have ${soilTesters.length} active soil testing requests`
+              : "No active soil testing requests"}
+          </p>
+        </div>
+
         {soilTesters.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {soilTesters.map((tester) => (
@@ -88,14 +101,24 @@ const SoilTesterList = () => {
                 className="bg-white rounded-lg shadow-lg overflow-hidden relative hover:shadow-xl transition duration-300"
               >
                 <div className="relative">
-                  <img
-                    src={farm}
-                    alt="Farm"
-                    className="object-cover h-48 w-full rounded-t-lg"
-                  />
+                  {/* Land Image (using actual land image if available, otherwise default land icon) */}
+                  {tester.land?.image ? (
+                    <img
+                      src={tester.land.image}
+                      alt="Land"
+                      className="object-cover h-48 w-full rounded-t-lg"
+                    />
+                  ) : (
+                    <div className="h-48 w-full bg-gray-100 flex items-center justify-center rounded-t-lg">
+                      <LandPlot className="h-16 w-16 text-gray-400" />
+                    </div>
+                  )}
+                  
+                  {/* Farmer Avatar (using default avatar if no image) */}
                   <div className="absolute top-4 left-4 bg-white rounded-full p-1 border-4 border-white">
                     <img
-                      src={farmer}
+                      src={tester.farmer?.profile?.image || 
+                           getDefaultAvatar(`${tester.farmer.profile.firstName} ${tester.farmer.profile.lastName}`)}
                       alt="Farmer"
                       className="h-16 w-16 object-cover rounded-full"
                     />
@@ -111,7 +134,7 @@ const SoilTesterList = () => {
                   <div className="text-gray-600 text-sm mb-3 mt-4">
                     <div className="flex items-center gap-2">
                       <MapPin className="text-gray-400" />
-                      <span>{tester.land.location.address}</span>
+                      <span>{tester.land.location.address || "Address not specified"}</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Droplets className="text-gray-400" />
@@ -149,7 +172,7 @@ const SoilTesterList = () => {
                   </div>
 
                   <div className="text-gray-500 text-xs mt-2 line-clamp-2">
-                    Additional Notes: {tester.additionalNotes}
+                    Additional Notes: {tester.additionalNotes || "No additional notes"}
                   </div>
 
                   <div className="mt-4 pt-4 border-t border-gray-200">
@@ -167,7 +190,7 @@ const SoilTesterList = () => {
             ))}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center h-screen text-center">
+          <div className="flex flex-col items-center justify-center h-[60vh] text-center">
             <img
               src={Thumb}
               alt="No Data"
@@ -176,7 +199,6 @@ const SoilTesterList = () => {
             <p className="text-xl text-gray-500">No test request for you yet</p>
           </div>
         )}
-
       </div>
     </DashboardLayout>
   );

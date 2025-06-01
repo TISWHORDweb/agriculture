@@ -30,7 +30,7 @@ const Sidebar = () => {
     const role = localStorage.getItem("role");
     if (role === "agent") {
       setMenuItems([
-        { icon: LayoutDashboard, label: "Dashboard", path: "/agent/dashboard" },
+        { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
         { icon: Grid, label: "Test Pool", path: "/test-pool" },
         { icon: TestTubesIcon, label: "My Tests", path: "/my-test" },
         { icon: User, label: "Profile", path: "/profile" },

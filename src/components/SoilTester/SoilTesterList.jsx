@@ -103,7 +103,7 @@ const SoilTesterList = () => {
             {soilTesters.map((tester) => (
               <div key={tester._id} className="bg-white rounded-lg shadow-sm p-6">
                 <div className="flex flex-col gap-3">
-                  <img src={farm} alt="farm image" className="object-cover rounded-md" />
+                  <img src={tester.land.image} alt="farm image" className="object-cover max-h-32 rounded-md" />
                    
                   <div className="text-2xl font-semibold text-[16px] flex justify-between ">
                     {`${tester.land.name}`}  <span className={`px-1 py-0 rounded text-xs ${getStatusColor( tester.status )}`} > {tester.status} </span>

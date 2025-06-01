@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const StatCard = ({
   title,
@@ -7,8 +8,10 @@ const StatCard = ({
   percentage,
   icon: Icon,
   color,
+  to
 }) => {
   return (
+   <Link to={to}>
     <div className="bg-white rounded-xl p-4 shadow-md">
       <div className="flex justify-between items-start">
         <div>
@@ -31,6 +34,7 @@ const StatCard = ({
         </div>
       </div>
     </div>
+   </Link>
   );
 }
 
