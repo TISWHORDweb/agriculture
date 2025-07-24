@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Wheat } from 'lucide-react';
+import Logo from '../../assets/logo.png'
 
 
 const AuthLayout = ({
@@ -15,7 +16,7 @@ const AuthLayout = ({
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
-          <Wheat className="h-12 w-12 text-green-500" />
+          <img src={Logo} alt="" className='h-20 w-20'/>
         </div>
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           {title}

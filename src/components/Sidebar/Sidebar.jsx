@@ -17,6 +17,7 @@ import SidebarItem from "./SidebarItem";
 import {useAuthStore} from "../../store/auth-store";
 import { toast } from "react-toastify";
 import Logout from "../Logout";
+import Logo from '../../assets/logo2.png'
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -57,11 +58,11 @@ const Sidebar = () => {
   return (
     <>
       {/* Mobile Navbar */}
-      <nav className="md:hidden fixed top-0 left-0 w-full bg-[#1E293B] z-50 flex justify-between items-center p-4">
-        <div className="flex items-center gap-2">
-          <Wheat className="h-8 w-8 text-green-400" />
+      <nav className="md:hidden fixed top-0 left-0 w-full bg-[#1E293B] z-50 flex justify-between items-center px-4">
+        <div className="flex items-center gap-2 px-4 py-3">
+            <img src={Logo} alt="" className='h-12 w-12'/>
           <span className="text-white text-xl font-semibold">
-            agri<span className="text-green-400">cultur</span>
+            FMA<span className="text-green-400">FS</span>
           </span>
         </div>
         <button
@@ -99,9 +100,9 @@ const Sidebar = () => {
       {/* Desktop Sidebar */}
       <div className="hidden md:flex fixed h-screen w-64 bg-[#1E293B] p-4 flex-col">
         <div className="flex items-center gap-2 px-4 py-3">
-          <Wheat className="h-8 w-8 text-green-400" />
+            <img src={Logo} alt="" className='h-12 w-12'/>
           <span className="text-white text-xl font-semibold">
-            agri<span className="text-green-400">cultur</span>
+            FMA<span className="text-green-400">FS</span>
           </span>
         </div>
 

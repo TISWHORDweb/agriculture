@@ -11,6 +11,8 @@ const ResultUpload = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const base_url = baseUrl();
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filteredData, setFilteredData] = useState([]);
 
   const storedUser = localStorage.getItem("authToken");
 
@@ -24,6 +26,7 @@ const ResultUpload = () => {
           },
         });
         setData(response.data.data);
+        setFilteredData(response.data.data);
       } catch (error) {
         console.error("Error fetching soil data:", error);
       }
@@ -31,6 +34,23 @@ const ResultUpload = () => {
 
     fetchSoilData();
   }, []);
+
+  const handleSearch = (e) => {
+    const term = e.target.value.toLowerCase();
+    setSearchTerm(term);
+console.log(term)
+    if (term === "") {
+      setFilteredData(data);
+    } else {
+    const filtered = data.filter(item => 
+      (item.uniqueId?.toString()?.toLowerCase()?.includes(term) ||
+      item.state?.toString()?.toLowerCase()?.includes(term) ||
+      item.lga?.toString()?.toLowerCase()?.includes(term) ||
+      item.ward?.toString()?.toLowerCase()?.includes(term))
+    );
+      setFilteredData(filtered);
+    }
+  };
 
   const BATCH_SIZE = 50;
   const adminId = "675abdb7894fc6f5196d3061";
@@ -113,7 +133,7 @@ const ResultUpload = () => {
           const endpoint = `/admin/test/all`;
           const response = await axios.get(`${base_url}${endpoint}`);
           setData(response.data.data);
-
+          setFilteredData(response.data.data); 
         } catch (error) {
           console.error("Error processing file:", error);
           alert("Error uploading file: " + error.message);
@@ -265,8 +285,26 @@ const ResultUpload = () => {
           )}
         </div>
 
+
+
         {data?.length > 0 && (
           <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="p-4 border-b">
+              <div className="relative max-w-md">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <svg className="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <input
+                  type="text"
+                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-green-500 focus:border-green-500 sm:text-sm"
+                  placeholder="Search by ID, State, LGA, or Ward"
+                  value={searchTerm}
+                  onChange={handleSearch}
+                />
+              </div>
+            </div>
             <div className="overflow-x-auto">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
@@ -295,7 +333,7 @@ const ResultUpload = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  {data?.map((row, index) => (
+                  {filteredData?.map((row, index) => (
                     <tr
                       key={index}
                       className="hover:bg-gray-50 transition-colors duration-150"
