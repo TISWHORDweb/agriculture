@@ -3,6 +3,7 @@ import * as XLSX from "xlsx";
 import axios from "axios";
 import DashboardLayout from "../Layout/DashboardLayout";
 import baseUrl from "../../hook/Network";
+import { toast } from "react-toastify";
 
 const ResultUpload = () => {
   const [data, setData] = useState([]);
@@ -102,6 +103,7 @@ console.log(term)
 
   const handleFileUpload = async (file) => {
     if (file) {
+      toast.warn("Analyzing.......");
       setFileName(file.name);
       setIsUploading(true);
       setUploadProgress(0);
@@ -133,6 +135,7 @@ console.log(term)
           const endpoint = `/admin/test/all`;
           const response = await axios.get(`${base_url}${endpoint}`);
           setData(response.data.data);
+          toast.success("File analyzed successfully");
           setFilteredData(response.data.data); 
         } catch (error) {
           console.error("Error processing file:", error);
